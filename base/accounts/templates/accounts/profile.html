@@ -3,5 +3,18 @@
 {% block title %}Profile{% endblock %}
 
 {% block body %}
-    <h2 class="text-center">{{ user.username }}</h2>
+    <h2 class="text-center">{{ user.username }}</h2><hr/>
+    <div class="card">
+        <p class="card-body">-username: {{ user.username }}<br/>-emai: {{ user.email }}<br/>-firstname: {{ user.first_name }}<br/>-lastname: {{ user.last_name }}<br/>-rest of your subscription: </p>
+    </div>
+    <br/>
+    <div class="row">
+    <div class="col-md-12 text-left">
+        {% if request.user.id == user.id %}
+            <a class="btn btn-primary col-md-2 btn-left" href="{% url 'accounts:edit_profile' %}">Edit</a>
+        {% endif %}
+        <a class="btn btn-light col-md-2 btn-left" href="{% url 'home:home' %}">Exit</a>
+    </div>
+</div>
+
 {% endblock %}

@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm,EditProfileForm
 
 
 class RegisterView(View):
@@ -79,4 +79,23 @@ class ProfileView(LoginRequiredMixin,View):
     def get(self,request,*args, **kwargs):
         user=User.objects.get(id=kwargs['user_id'])
         return render(request,'accounts/profile.html',{'user':user})
+class EditProfileView(LoginRequiredMixin,View):
+    form_class = EditProfileForm
+    template_name = 'accounts/edit_profile.html'
+    def get(self,request,*args, **kwargs):
+        form = self.form_class(initial={'username':request.user.username,'email':request.user.email,'first_name':request.user.first_name,'last_name':request.user.last_name})
+        return render(request,'accounts/edit_profile.html',{'form':form})
+
+    def post(self,request,*args, **kwargs):
+        form=self.form_class(request.POST,initial={'username':request.user.username,'email':request.user.email,'first_name':request.user.first_name,'last_name':request.user.last_name})
+        if form.is_valid():
+            cd = form.cleaned_data
+            request.user.username = cd['username']
+            request.user.email = cd['email']
+            request.user.first_name = cd['first_name']
+            request.user.last_name = cd['last_name']
+            request.user.save()
+            messages.success(request,'You are now logged in','success')
+            return redirect('accounts:profile',request.user.id)
+
 
