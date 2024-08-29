@@ -32,6 +32,9 @@ class RegisterView(View):
 class LoginView(View):
     form_class = LoginForm
     template_name = 'accounts/login.html'
+    def setup(self, request, *args, **kwargs):
+        self.next = request.GET.get('next')
+        return super().setup(request, *args, **kwargs)
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             messages.error(request, 'You are already logged in','warning')
@@ -48,6 +51,8 @@ class LoginView(View):
             if user is not None:
                 login(request,user)
                 messages.success(request,'You are now logged in','success')
+                if self.next:
+                    return redirect(self.next)
                 return redirect('home:home')
             else:
                 messages.error(request,' username or password is not correct','error')
@@ -69,3 +74,9 @@ class UserPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     success_url = reverse_lazy('accounts:password_reset_complete')
 class UserPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
     template_name = 'accounts/password_reset_complete.html'
+
+class ProfileView(LoginRequiredMixin,View):
+    def get(self,request,*args, **kwargs):
+        user=User.objects.get(id=kwargs['user_id'])
+        return render(request,'accounts/profile.html',{'user':user})
+
