@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 
 
-class LoginForm(forms.Form):
+class RegisterForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control','placeholder': 'username'}))
     email = forms.CharField(widget=forms.EmailInput(attrs={'class': 'form-control','placeholder': 'email'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control','placeholder': 'password'}))
@@ -27,6 +27,9 @@ class LoginForm(forms.Form):
         password_check = cleaned_data.get('password_check')
         if password and password_check and password != password_check:
             raise ValidationError('Passwords do not match')
+class LoginForm(forms.Form):
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control','placeholder': 'username'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control','placeholder': 'password'}))
 
 
 
