@@ -79,10 +79,25 @@ class UserPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
 class ProfileView(LoginRequiredMixin,View):
     def get(self,request,*args, **kwargs):
         user=User.objects.get(id=kwargs['user_id'])
-        time = Subscription.objects.filter(user=user).first()
-        if time:
-            rest_time = time.rest_of_time()
+        time1 = request.GET.get('price')
+
+        if Subscription.objects.filter(user=user).exists():
+            extra=Subscription.objects.filter(user=user).first()
+            if time1 and time1.isdigit():
+                time1=int(time1)
+                extra.time=int(extra.time)+int(time1)
+                extra.save()
+                return redirect('accounts:profile',request.user.id)
+            rest_time = extra.rest_of_time()
             return render(request,'accounts/profile.html',{'user':user,'rest_time':rest_time})
+
+        time = Subscription.objects.filter(user=user).first()
+        if time1 and time1.isdigit() and not Subscription.objects.filter(user=user).exists():
+            time1=int(time1)
+            Subscription.objects.create(user=user,time=time1)
+            return redirect('accounts:profile', request.user.id)
+        else:
+            time1 = 0
         return render(request,'accounts/profile.html',{'user':user,'rest_time':0})
 class EditProfileView(LoginRequiredMixin,View):
     form_class = EditProfileForm

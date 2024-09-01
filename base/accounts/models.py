@@ -6,13 +6,14 @@ from django.utils import timezone
 class Subscription(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name='used_with')
     created = models.DateTimeField(auto_now_add=True)
+    time = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.user} - {self.created}'
 
-    def rest_of_time(self):
 
-        total_duration = 30 * 24 * 60 * 60
+    def rest_of_time(self):
+        total_duration = self.time * 24 * 60 * 60
         elapsed_time = (timezone.now() - self.created).total_seconds()
         remaining_time = total_duration - elapsed_time
         remaining_time = timedelta(seconds=remaining_time)

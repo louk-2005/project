@@ -40,12 +40,7 @@ class EditProfileForm(forms.Form):
     class Meta:
         model = User
         fields =[]
-class ByeSubscriberForm(forms.Form):
-    KINDS_OF_SUBSCRIBER=[
-        ('30','For a month'),
-        ('20','For 20 days'),
-        ('10','For 10 days'),
-    ]
+
 
 
 
