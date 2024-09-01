@@ -8,6 +8,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 
 from .forms import LoginForm, RegisterForm,EditProfileForm
+from .models import Subscription
 
 
 class RegisterView(View):
@@ -78,7 +79,11 @@ class UserPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
 class ProfileView(LoginRequiredMixin,View):
     def get(self,request,*args, **kwargs):
         user=User.objects.get(id=kwargs['user_id'])
-        return render(request,'accounts/profile.html',{'user':user})
+        time = Subscription.objects.filter(user=user).first()
+        if time:
+            rest_time = time.rest_of_time()
+            return render(request,'accounts/profile.html',{'user':user,'rest_time':rest_time})
+        return render(request,'accounts/profile.html',{'user':user,'rest_time':0})
 class EditProfileView(LoginRequiredMixin,View):
     form_class = EditProfileForm
     template_name = 'accounts/edit_profile.html'
