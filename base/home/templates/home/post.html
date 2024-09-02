@@ -4,5 +4,17 @@
 
 {% block body %}
     <p><a href="{% url 'home:Topic_info' post.topic.id %}">{{ post.topic.topic }}</a> / {{ post.updated |date:'Y-M-D' }}</p>
-    <a>{{ post.body }}</a><hr/>
+    <a>{{ post.body }}</a><br/><br/>
+    <a class=" btn btn-blue col-md-1 " href="{% url 'home:like' post.id %}">Like {{ post.number_of_likes }}</a>
+    <a class=" btn btn-red col-md-1 " href="{% url 'home:dislike' post.id %}">Dislike {{ post.number_of_dislikes}}</a><hr/>
+
+    <p>{{ comments.count }} comments</p>
+    {% for comment in comments %}
+        <div class="card bg-dark text-white">
+        <p class="card-header">{{ comment.user }}|{{ comment.created|timesince }}</p>
+            <p class="card-body">{{ comment.body }}</p>
+        </div>
+    {% empty %}
+        <p>there is not any comment on this post! </p>
+    {% endfor %}
 {% endblock %}

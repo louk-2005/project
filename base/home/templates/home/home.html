@@ -10,7 +10,7 @@
         {% for post in posts %}
             {% if post.primary == 1 %}
                 {% if can_see == 1 %}
-                    <a class="card-body  red-text" href="{% url 'home:Topic_info' post.topic.id %}">{{ post.body|truncatewords:8 }}</a><hr/>
+                    <a class="card-body  red-text" href="{% url 'home:post' post.id post.slug %}">{{ post.body|truncatewords:8 }}</a><hr/>
                 {% elif can_see == 0 and request.user.is_authenticated%}
                     <a class="card-body  red-text" href="{% url 'home:prices' %}">{{ post.body|truncatewords:8 }}</a><hr/>
                 {% else %}
@@ -20,7 +20,7 @@
 
             {% else %}
                 {% if request.user.is_authenticated %}
-                    <a class="card-body " href="{% url 'home:Topic_info' post.topic.id %}">{{ post.body|truncatewords:8 }}</a><hr/>
+                    <a class="card-body " href="{% url 'home:post' post.id post.slug %}">{{ post.body|truncatewords:8 }}</a><hr/>
                 {% else %}
                     <a class="card-body " href="{% url 'accounts:login'  %}">{{ post.body|truncatewords:8 }}</a><hr/>
                 {% endif %}

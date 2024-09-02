@@ -18,3 +18,8 @@ class Subscription(models.Model):
         remaining_time = total_duration - elapsed_time
         remaining_time = timedelta(seconds=remaining_time)
         return remaining_time
+
+def is_subscribed(user):
+    if Subscription.objects.filter(user=user).exists():
+        return 1
+    return 0

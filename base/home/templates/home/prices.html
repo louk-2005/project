@@ -3,6 +3,7 @@
 {% block title %}Prices{% endblock %}
 
 {% block body %}
+    <h2 class="text-center">Prices</h2><hr/>
     <div class="card">
         <br/><a class="text-center" href="{% url 'accounts:profile' request.user.id %}?price={{ 30 }}">bye for month</a><br/><hr/>
         <br/><a class="text-center" href="{% url 'accounts:profile' request.user.id %}?price={{ 20 }}">bye for 20 days</a><br/><hr/>
