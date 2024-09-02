@@ -91,7 +91,6 @@ class ProfileView(LoginRequiredMixin,View):
             rest_time = extra.rest_of_time()
             return render(request,'accounts/profile.html',{'user':user,'rest_time':rest_time})
 
-        time = Subscription.objects.filter(user=user).first()
         if time1 and time1.isdigit() and not Subscription.objects.filter(user=user).exists():
             time1=int(time1)
             Subscription.objects.create(user=user,time=time1)
