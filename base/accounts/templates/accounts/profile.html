@@ -4,6 +4,7 @@
 
 {% block body %}
     <h2 class="text-center">{{ user.username }}</h2><hr/>
+    <a href="{% url 'accounts:favorite_page' %}">Your favorite post</a>
     <div class="card">
         <p class="card-body">-username: {{ user.username }}<br/>-emai: {{ user.email }}<br/>-firstname: {{ user.first_name }}<br/>-lastname: {{ user.last_name }}<br/>-rest of your subscription: {{rest_time }}<br/><a href="{% url 'accounts:reset_password' %}">Change the password</a> </p>
     </div>

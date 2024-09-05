@@ -8,7 +8,8 @@ from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 
 from .forms import LoginForm, RegisterForm,EditProfileForm
-from .models import Subscription
+from .models import Subscription, MyFavorite, is_subscribed
+from home.models import Post
 
 
 class RegisterView(View):
@@ -27,7 +28,7 @@ class RegisterView(View):
         if form.is_valid():
             cd = form.cleaned_data
             user = User.objects.create_user(username=cd['username'],email=cd['email'],password=cd['password'])
-            messages.success(request,'You are now logged in','success')
+            messages.success(request,'You are now registered  ','success')
             return redirect('home:home')
         return render(request,self.template_name,{'form':form})
 class LoginView(View):
@@ -81,6 +82,7 @@ class ProfileView(LoginRequiredMixin,View):
         user=User.objects.get(id=kwargs['user_id'])
         time1 = request.GET.get('price')
 
+
         if Subscription.objects.filter(user=user).exists():
             extra=Subscription.objects.filter(user=user).first()
             if time1 and time1.isdigit():
@@ -116,5 +118,24 @@ class EditProfileView(LoginRequiredMixin,View):
             request.user.save()
             messages.success(request,'You are now logged in','success')
             return redirect('accounts:profile',request.user.id)
+
+class FavoriteView(LoginRequiredMixin,View):
+    def get(self,request,*args, **kwargs):
+        post = Post.objects.get(id=kwargs['post_id'])
+        favorite = MyFavorite.objects.filter(user=request.user , post=post).exists()
+        if favorite:
+            messages.warning(request,'You are choose this post as your favorite at last','warning')
+        elif not favorite and is_subscribed(request.user) == 1:
+            MyFavorite.objects.create(user=request.user,post=post)
+            messages.success(request,'You are choose this post as favorite now', 'success')
+            return redirect('home:post',post.id, post.slug)
+        else:
+            return redirect('home:prices')
+        return redirect('home:post',post.id, post.slug)
+class FavoritePageView(View):
+    def get(self,request,*args, **kwargs):
+        favorites = request.user.favorites.all()
+        return render(request,'accounts/favorite_page.html',{'favorites':favorites})
+
 
 

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Favorite{% endblock %}
+
+{% block body %}
+        {% for favorite in favorites %}
+            <div class="card">
+                <a class="card-header bg-primary text-white">{{ favorite.post.topic.topic }} | {{ favorite.created }}</a>
+                <a class="card-body " href="{% url 'home:post' favorite.post.id favorite.post.slug %}">{{ favorite.post.body }}</a>
+            </div>
+        {% endfor %}
+{% endblock %}

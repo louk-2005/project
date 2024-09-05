@@ -3,17 +3,39 @@
 {% block title %}Post{% endblock %}
 
 {% block body %}
+    <a class="btn btn-light" href="{% url 'accounts:favorite' post.id %}">Add to Favorite</a><br/><br/>
     <p><a href="{% url 'home:Topic_info' post.topic.id %}">{{ post.topic.topic }}</a> / {{ post.updated |date:'Y-M-D' }}</p>
     <a>{{ post.body }}</a><br/><br/>
     <a class=" btn btn-blue col-md-1 " href="{% url 'home:like' post.id %}">Like {{ post.number_of_likes }}</a>
     <a class=" btn btn-red col-md-1 " href="{% url 'home:dislike' post.id %}">Dislike {{ post.number_of_dislikes}}</a><hr/>
-
+    <h2>Comments: </h2>
+    {% if request.user.is_authenticated %}
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Send">
+        </form><br/>
+    {% else %}
+        <p class="alert alert-danger">only login user can send comment</p>
+    {% endif %}
     <p>{{ comments.count }} comments</p>
     {% for comment in comments %}
         <div class="card bg-dark text-white">
-        <p class="card-header">{{ comment.user }}|{{ comment.created|timesince }}</p>
+            <p class="card-header">{{ comment.user }} | {{ comment.created|timesince }}</p>
             <p class="card-body">{{ comment.body }}</p>
-        </div>
+            <form action="{% url 'home:reply' post.id comment.id %}" method="post">
+                {% csrf_token %}
+                {{ form_reply.as_p }}
+                <input type="submit" value="Send">
+            </form><br/>
+
+            {% with replies=comment.replies.all%}
+            {% for reply in replies %}
+                <p class="card-body bg-primary p-3 m-2"><a>{{ reply.user }} | {{ reply.created|timesince }}</a><br/><br/>{{ reply.body }}</p>
+            {% endfor %}
+            {% endwith %}
+        </div><br/>
+
     {% empty %}
         <p>there is not any comment on this post! </p>
     {% endfor %}
