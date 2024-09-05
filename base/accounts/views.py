@@ -125,12 +125,12 @@ class FavoriteView(LoginRequiredMixin,View):
         favorite = MyFavorite.objects.filter(user=request.user , post=post).exists()
         if favorite:
             messages.warning(request,'You are choose this post as your favorite at last','warning')
-        elif not favorite and is_subscribed(request.user) == 1:
+        elif not favorite and post.primary == True and is_subscribed(request.user) == 0:
+            return redirect('home:prices')
+        elif not favorite:
             MyFavorite.objects.create(user=request.user,post=post)
             messages.success(request,'You are choose this post as favorite now', 'success')
             return redirect('home:post',post.id, post.slug)
-        else:
-            return redirect('home:prices')
         return redirect('home:post',post.id, post.slug)
 class FavoritePageView(View):
     def get(self,request,*args, **kwargs):

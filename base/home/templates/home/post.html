@@ -6,6 +6,13 @@
     <a class="btn btn-light" href="{% url 'accounts:favorite' post.id %}">Add to Favorite</a><br/><br/>
     <p><a href="{% url 'home:Topic_info' post.topic.id %}">{{ post.topic.topic }}</a> / {{ post.updated |date:'Y-M-D' }}</p>
     <a>{{ post.body }}</a><br/><br/>
+    {% for image in images %}
+        <div class="card col row">
+            <p class="card-header">{{ image.post.topic.topic }} | {{ image.name }} | {{ image.created }}</p>
+            <img src="{{ image.image.url }}" alt="" class="col-md-4">
+        </div><br/><br/>
+    {% endfor %}
+
     <a class=" btn btn-blue col-md-1 " href="{% url 'home:like' post.id %}">Like {{ post.number_of_likes }}</a>
     <a class=" btn btn-red col-md-1 " href="{% url 'home:dislike' post.id %}">Dislike {{ post.number_of_dislikes}}</a><hr/>
     <h2>Comments: </h2>

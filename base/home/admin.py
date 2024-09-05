@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Topic, Post, LikePost, DislikePost, Comment
+from .models import Topic, Post, LikePost, DislikePost, Comment, Image
 
 admin.site.register(Topic)
 
@@ -21,3 +21,6 @@ admin.site.register(DislikePost)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('user','post','is_reply','body','created')
     raw_id_fields = ('user','post','reply')
+class ImageAdmin(admin.ModelAdmin):
+    raw_id_fields = ('post',)
+admin.site.register(Image, ImageAdmin)

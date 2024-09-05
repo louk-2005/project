@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from .models import Topic, Post, LikePost, DislikePost,Comment
+from .models import Topic, Post, LikePost, DislikePost,Comment, Image
 from .forms import CommentForm,ReplyForm
 from accounts.models import is_subscribed
 
@@ -14,9 +14,10 @@ class HomeView(View):
         can_see=0
         topics = Topic.objects.all()
         posts = Post.objects.all()
+        images = Image.objects.all()
         if request.user.is_authenticated:
             can_see = is_subscribed(request.user)
-        return render(request,'home/home.html',{'topics':topics,'posts':posts,'can_see':can_see})
+        return render(request,'home/home.html',{'topics':topics,'posts':posts,'can_see':can_see,'images':images})
 class PricesView(View):
     def get(self, request):
         return render(request,'home/prices.html')
@@ -40,7 +41,8 @@ class PostView(View):
         comments = post.Pcomments.filter(is_reply=False)
         form = self.form_class()
         form_reply = self.from_class_reply()
-        return render(request, 'home/post.html',{'post':post ,'comments':comments,'form':form,'form_reply':form_reply})
+        images = post.images.all()
+        return render(request, 'home/post.html',{'post':post ,'comments':comments,'form':form,'form_reply':form_reply,'images':images})
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         form = CommentForm(request.POST)
@@ -62,6 +64,7 @@ class LikeView(View):
         elif dislike_post:
             dislike_post.delete()
             LikePost.objects.create(user=request.user, post=post)
+            messages.success(request, 'You like this post successfully', 'success')
         else:
             LikePost.objects.create(user=request.user, post=post)
             messages.success(request,'You like this post successfully','success')
@@ -74,10 +77,12 @@ class DislikeView(View):
         if like_post :
             like_post.delete()
             DislikePost.objects.create(user=request.user, post=post)
+            messages.success(request, 'You disliked this post successfully', 'success')
         elif dislike_post :
             messages.error(request,'You disliked this post at last','danger')
         else:
             DislikePost.objects.create(user=request.user, post=post)
+            messages.success(request, 'You disliked this post successfully', 'success')
         return redirect('home:post', post.id, post.slug)
 class ReplyView(View):
     form_class = ReplyForm

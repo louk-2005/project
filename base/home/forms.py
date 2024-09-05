@@ -21,3 +21,6 @@ class ReplyForm(forms.ModelForm):
         labels ={
             'body': 'Reply',
         }
+class ImageForm(forms.Form):
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Name'}))
+    image = forms.ImageField()
