@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from .models import Topic, Post, LikePost, DislikePost,Comment, Image
+from .models import Topic, Post, LikePost, DislikePost,Comment
 from .forms import CommentForm,ReplyForm
 from accounts.models import is_subscribed
 
@@ -12,12 +12,11 @@ from accounts.models import is_subscribed
 class HomeView(View):
     def get(self, request):
         can_see=0
-        topics = Topic.objects.all()
+        topics = Topic.objects.filter()
         posts = Post.objects.all()
-        images = Image.objects.all()
         if request.user.is_authenticated:
             can_see = is_subscribed(request.user)
-        return render(request,'home/home.html',{'topics':topics,'posts':posts,'can_see':can_see,'images':images})
+        return render(request,'home/home.html',{'topics':topics,'posts':posts,'can_see':can_see})
 class PricesView(View):
     def get(self, request):
         return render(request,'home/prices.html')
@@ -25,11 +24,11 @@ class PricesView(View):
 class TopicInfoView(View):
     def get(self, request,*args, **kwargs):
         can_see=0
-        topic_info = Topic.objects.get(id=kwargs['topic_id'])
-        posts = topic_info.posts.all()
+        topic = Topic.objects.get(id=kwargs['topic_id'])
+        posts = topic.posts.all()
         if request.user.is_authenticated:
             can_see = is_subscribed(request.user)
-        return render(request, 'home/topic_info.html',{'topic_info':topic_info,'posts':posts,'can_see':can_see})
+        return render(request, 'home/topic_info.html',{'topic':topic,'posts':posts,'can_see':can_see})
 class PostView(View):
     form_class = CommentForm
     from_class_reply = ReplyForm
@@ -41,8 +40,7 @@ class PostView(View):
         comments = post.Pcomments.filter(is_reply=False)
         form = self.form_class()
         form_reply = self.from_class_reply()
-        images = post.images.all()
-        return render(request, 'home/post.html',{'post':post ,'comments':comments,'form':form,'form_reply':form_reply,'images':images})
+        return render(request, 'home/post.html',{'post':post ,'comments':comments,'form':form,'form_reply':form_reply})
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         form = CommentForm(request.POST)

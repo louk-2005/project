@@ -1,11 +1,12 @@
 from django.contrib import admin
+from mptt.admin import MPTTModelAdmin
 
-from .models import Topic, Post, LikePost, DislikePost, Comment, Image
+from .models import Topic, Post, LikePost, DislikePost, Comment
 
-admin.site.register(Topic)
+admin.site.register(Topic, MPTTModelAdmin)
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('topic','body','slug','primary')
+    list_display = ('topic','slug','primary')
     list_filter = ('updated','topic')
     search_fields = ('body','slug')
     prepopulated_fields = {'slug': ('body',)}
@@ -21,6 +22,3 @@ admin.site.register(DislikePost)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('user','post','is_reply','body','created')
     raw_id_fields = ('user','post','reply')
-class ImageAdmin(admin.ModelAdmin):
-    raw_id_fields = ('post',)
-admin.site.register(Image, ImageAdmin)

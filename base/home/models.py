@@ -1,14 +1,21 @@
 from django.db import models
 from django.contrib.auth.models import User
+from ckeditor_uploader.fields import RichTextUploadingField
+from mptt.models import MPTTModel, TreeForeignKey
 
+class Topic(MPTTModel):
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    name = models.CharField(max_length=100,default='name')
+    is_parent = models.BooleanField(default=False)
 
-class Topic(models.Model):
-    topic = models.CharField(max_length=50)
-    created = models.DateTimeField(auto_now_add=True)
+    class MPTTMeta:
+        order_insertion_by = ['name']
+    def __str__(self):
+        return self.name
 
 class Post(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='posts')
-    body = models.TextField()
+    body = RichTextUploadingField()
     primary=models.BooleanField(default=False)
     slug = models.SlugField(unique=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -43,13 +50,6 @@ class Comment(models.Model):
     def __str__(self):
         return f'{self.user}-{self.post}-{self.body}'
 
-class Image(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images', null=True, blank=True)
-    name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='images/%Y/%m/%d/')
-    created = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return f'{self.name} - {self.created}'
 
 
 

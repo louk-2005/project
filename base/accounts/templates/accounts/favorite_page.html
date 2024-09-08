@@ -6,7 +6,7 @@
         {% for favorite in favorites %}
             <div class="card">
                 <a class="card-header bg-primary text-white">{{ favorite.post.topic.topic }} | {{ favorite.created }}</a>
-                <a class="card-body {% if favorite.post.primary %}red-text{% endif %}" href="{% url 'home:post'  favorite.post.id favorite.post.slug %}" >{{ favorite.post.body }}</a>
+                <a class="card-body {% if favorite.post.primary %}red-text{% endif %}" href="{% url 'home:post'  favorite.post.id favorite.post.slug %}" >{{ favorite.post.body|truncatewords:8 |safe}}</a>
             </div>
         {% endfor %}
 {% endblock %}
