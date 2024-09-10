@@ -9,6 +9,12 @@
 
     <a class=" btn btn-blue col-md-1 " href="{% url 'home:like' post.id %}">Like {{ post.number_of_likes }}</a>
     <a class=" btn btn-red col-md-1 " href="{% url 'home:dislike' post.id %}">Dislike {{ post.number_of_dislikes}}</a><hr/>
+
+    <h2>Suggestion:</h2><br/>
+    {% for item in posts %}
+        <a href="{% url 'home:post' item.id item.slug %}">{{ item.issue }}</a>
+    {% endfor %}<br/><br/>
+
     <h2>Comments: </h2>
     {% if request.user.is_authenticated %}
         <form action="" method="post">

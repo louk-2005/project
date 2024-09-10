@@ -19,11 +19,19 @@ from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from payment.views import go_to_gateway_view
+
+from azbankgateways.urls import az_bank_gateways_urls
+
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('home.urls',namespace='home')),
     path('accounts/', include('accounts.urls',namespace='accounts')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('go-to-gateway/', go_to_gateway_view),
+    path("bankgateways/", az_bank_gateways_urls()),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

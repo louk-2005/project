@@ -15,6 +15,7 @@ class Topic(MPTTModel):
 
 class Post(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='posts')
+    issue = models.CharField(max_length=100,unique=True,default='')
     body = RichTextUploadingField()
     primary=models.BooleanField(default=False)
     slug = models.SlugField(unique=True)

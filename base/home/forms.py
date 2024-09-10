@@ -25,3 +25,5 @@ class ImageForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Name'}))
     image = forms.ImageField()
 
+class SearchForm(forms.Form):
+    search = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))

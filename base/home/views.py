@@ -1,22 +1,27 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.views import View
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 from .models import Topic, Post, LikePost, DislikePost,Comment
-from .forms import CommentForm,ReplyForm
+from .forms import CommentForm,ReplyForm,SearchForm
 from accounts.models import is_subscribed
 
 
 class HomeView(View):
+    form_class = SearchForm
+
     def get(self, request):
         can_see=0
         topics = Topic.objects.filter()
         posts = Post.objects.all()
+        if request.GET.get('search'):
+            posts = posts.filter(issue__contains=request.GET['search'])
         if request.user.is_authenticated:
             can_see = is_subscribed(request.user)
-        return render(request,'home/home.html',{'topics':topics,'posts':posts,'can_see':can_see})
+        return render(request,'home/home.html',{'topics':topics,'posts':posts,'can_see':can_see,'form':self.form_class})
 class PricesView(View):
     def get(self, request):
         return render(request,'home/prices.html')
@@ -24,7 +29,7 @@ class PricesView(View):
 class TopicInfoView(View):
     def get(self, request,*args, **kwargs):
         can_see=0
-        topic = Topic.objects.get(id=kwargs['topic_id'])
+        topic = get_object_or_404(Topic,pk=kwargs['topic_id'])
         posts = topic.posts.all()
         if request.user.is_authenticated:
             can_see = is_subscribed(request.user)
@@ -33,14 +38,15 @@ class PostView(View):
     form_class = CommentForm
     from_class_reply = ReplyForm
     def setup(self, request, *args, **kwargs):
-        self.post_instance=Post.objects.get(id=kwargs['post_id'],slug=kwargs['post_slug'])
+        self.post_instance=get_object_or_404(Post,pk=kwargs['post_id'],slug=kwargs['post_slug'])
         return super().setup(request, *args, **kwargs)
     def get(self, request, *args, **kwargs):
         post = self.post_instance
         comments = post.Pcomments.filter(is_reply=False)
         form = self.form_class()
         form_reply = self.from_class_reply()
-        return render(request, 'home/post.html',{'post':post ,'comments':comments,'form':form,'form_reply':form_reply})
+        posts = Post.objects.filter(topic=post.topic)
+        return render(request, 'home/post.html',{'post':post ,'comments':comments,'form':form,'form_reply':form_reply,'posts':posts})
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         form = CommentForm(request.POST)
@@ -54,11 +60,12 @@ class PostView(View):
             return redirect('home:post', post.id, post.slug)
 class LikeView(View):
     def get(self, request, *args, **kwargs):
-        post = Post.objects.get(id=kwargs['post_id'])
+        post = get_object_or_404(Post,pk=kwargs['post_id'])
         like_post = LikePost.objects.filter(user=request.user, post=post)
         dislike_post = DislikePost.objects.filter(user=request.user, post=post)
         if like_post:
-            messages.error(request,'You liked this post at last','danger')
+            like_post.delete()
+            messages.error(request,'You are remove like this post','danger')
         elif dislike_post:
             dislike_post.delete()
             LikePost.objects.create(user=request.user, post=post)
@@ -69,7 +76,7 @@ class LikeView(View):
         return redirect('home:post', post.id,post.slug)
 class DislikeView(View):
     def get(self, request, *args, **kwargs):
-        post = Post.objects.get(id=kwargs['post_id'])
+        post = get_object_or_404(Post,pk=kwargs['post_id'])
         like_post = LikePost.objects.filter(user=request.user, post=post)
         dislike_post = DislikePost.objects.filter(user=request.user, post=post)
         if like_post :
@@ -77,7 +84,8 @@ class DislikeView(View):
             DislikePost.objects.create(user=request.user, post=post)
             messages.success(request, 'You disliked this post successfully', 'success')
         elif dislike_post :
-            messages.error(request,'You disliked this post at last','danger')
+            dislike_post.delete()
+            messages.error(request,'You remove disliked the post ','danger')
         else:
             DislikePost.objects.create(user=request.user, post=post)
             messages.success(request, 'You disliked this post successfully', 'success')
@@ -85,8 +93,8 @@ class DislikeView(View):
 class ReplyView(View):
     form_class = ReplyForm
     def post(self, request, *args, **kwargs):
-        post = Post.objects.get(id=kwargs['post_id'])
-        comment = Comment.objects.get(id=kwargs['comment_id'])
+        post = get_object_or_404(Post,pk=kwargs['post_id'])
+        comment = get_object_or_404(Comment,pk=kwargs['comment_id'])
         form = self.form_class(request.POST)
         if form.is_valid():
             Reply = form.save(commit=False)

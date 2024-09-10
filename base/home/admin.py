@@ -1,12 +1,14 @@
 from django.contrib import admin
-from mptt.admin import MPTTModelAdmin
+from mptt.admin import MPTTModelAdmin,DraggableMPTTAdmin
 
 from .models import Topic, Post, LikePost, DislikePost, Comment
 
-admin.site.register(Topic, MPTTModelAdmin)
+class TopicAdmin(DraggableMPTTAdmin):
+    raw_id_fields = ('parent', )
+admin.site.register(Topic, TopicAdmin)
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('topic','slug','primary')
+    list_display = ('issue','topic','slug','primary')
     list_filter = ('updated','topic')
     search_fields = ('body','slug')
     prepopulated_fields = {'slug': ('body',)}
